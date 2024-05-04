@@ -8,7 +8,7 @@ export default function RootLayout({ children }: MainLayoutProps) {
   return (
     <main className="flex flex-col w-full h-full">
       <Header />
-      <section className="flex flex-col p-6 bg-hero w-full h-full">
+      <section className="flex flex-col p-6 bg-hero w-screen h-screen">
         {children}
       </section>
     </main>

@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { addUser } from "../data";
 import RootLayout from "./MainLayout";
+import { AxiosPost } from "../Components/crud";
+import FormContainer from "../Components/Layouts/FormContainer";
+import Form from "../Components/Layouts/Form";
 
 interface signUpProps {
   firstName: string;
@@ -30,6 +33,54 @@ function RegistrationsPage() {
     });
   };
 
+  const formData = [
+    {
+      id: 3,
+      name: "firstName",
+      type: "firstName",
+      placeholder: "Enter your first name",
+      title: "First Name", 
+      setInputState: (value: any) => setStates({ ...states, firstName: value }),
+      defaultValue: states.firstName,
+    },
+    {
+      id: 4,
+      name: "LastName",
+      type: "lastName",
+      placeholder: "Enter your last name",
+      title: "Last Name", 
+      setInputState: (value: any) => setStates({ ...states, lastName: value }),
+      defaultValue: states.lastName,
+    },
+    {
+      id: 0,
+      name: "email",
+      type: "text",
+      placeholder: "Enter your email",
+      title: "Email", 
+      setInputState: (value: any) => setStates({ ...states, email: value }),
+      defaultValue: states.email,
+    },
+    {
+      id: 1,
+      name: "password",
+      type: "password",
+      placeholder: "Enter your password",
+      title: "Password", 
+      setInputState: (value: any) => setStates({ ...states, password: value }),
+      defaultValue: states.password,
+    },
+    {
+      id: 2,
+      name: "confirmPassword",
+      type: "password",
+      placeholder: "Confirm password",
+      title: "Confirm Password", 
+      setInputState: (value: any) => setStates({ ...states, confirmPassword: value }),
+      defaultValue: states.confirmPassword,
+    }
+  ]
+
   useEffect(() => {
     const user = sessionStorage.getItem("user");
     if (user) {
@@ -37,24 +88,33 @@ function RegistrationsPage() {
     }
   }, [navigate]);
 
-  const submit = () => {
+  const submit = async () => {
     const newUser = {
       id: Math.floor(Math.random() * 1000),
-      firstName: states.firstName,
-      lastName: states.lastName,
+      firstname: states.firstName,
+      lastname: states.lastName,
       email: states.email,
       password: states.password,
-      isAdmin: false,
+      isadmin: false,
     };
 
-    addUser(newUser);
-    sessionStorage.setItem("user", JSON.stringify({
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-        isAdmin: false
-        
-    })); 
-    navigate("/dashboard");
+    try {
+      const res = await AxiosPost("register", newUser);
+      if (res.isSuccess) { 
+        sessionStorage.setItem("user", JSON.stringify({
+            id: res.data.id,
+            firstname: newUser.firstname,
+            lastname: newUser.lastname,
+            email: newUser.email,
+            isadmin: newUser.isadmin
+        })); 
+        navigate("/dashboard");
+      }else{
+        throw new Error("Something went wrong!");
+      }
+      }catch (error) {
+        console.error(error);
+      }
   };
   const validateFields = () => {
     console.log(states);
@@ -73,7 +133,7 @@ function RegistrationsPage() {
 
   return (
     <RootLayout>
-      <div>
+      {/* <div>
         <div className="alert">{states.alertWarning}</div>
         <div className="form">
           <div
@@ -123,7 +183,16 @@ function RegistrationsPage() {
           </div>
           <button onClick={validateFields}>Sign up</button>
         </div>
-      </div>
+      </div> */}
+      <FormContainer>
+          <h1 className="font-bold">Sign Up</h1>  
+          {states.alertWarning?.length !== 0 &&
+          <div className="bg-red-400 mt-1 text-sm text-white rounded-sm px-1 py-2">{states.alertWarning}</div>}
+          <Form btnTitle="Sign Up" buttonHandler={validateFields} formData={formData}/> 
+          <div className="text-gray-400 text-sm mt-2">
+            Already have an account? <Link to="/">Login</Link>
+          </div>
+        </FormContainer>
     </RootLayout>
   );
 }

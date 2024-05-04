@@ -1,10 +1,11 @@
 import React from 'react'
 import { Users, addEvent } from '../../data';
-import { useNavigate } from 'react-router-dom';
-import { AxiosGet, AxiosPost } from '../../Components/crud';
+import { useNavigate, useParams } from 'react-router-dom';
+import { AxiosGet, AxiosPost, AxiosPut } from '../../Components/crud';
 import RootLayout from '../MainLayout';
 import FormContainer from '../../Components/Layouts/FormContainer';
 import Form from '../../Components/Layouts/Form';
+import dayjs from 'dayjs';
 
 interface CreateEventStates {
     name: string,
@@ -14,9 +15,10 @@ interface CreateEventStates {
     desc: string,
     alertWarning: string
 }
-function CreateEvents() {
+function EditEvents() {
     const userSession = sessionStorage.getItem('user');  
     const user = userSession ? JSON.parse(userSession): '';
+    const eventId = useParams().id;
     const [states, setStates] = React.useState<CreateEventStates>({
         name: '',
         date: '',
@@ -25,7 +27,24 @@ function CreateEvents() {
         desc: '',
         alertWarning: ''
     });
-
+    
+    const updateStates = (key: string, value: any) => {
+        setStates({
+            ...states,
+            [key]: value
+        });
+    }
+    const populateFields = (event: any) => { 
+        // updateStates('name', event.name);
+        // updateStates('date', event.datetime);
+        // updateStates('desc', event.description);
+        setStates((prev) => ({
+            ...prev,
+            name: event.name,
+            date: dayjs(event.datetime).format('MM/DD/YYYY'),
+            desc: event.description
+        })); 
+    }
     React.useEffect(() => {
         const getUsers = async () => {
             try {
@@ -41,19 +60,29 @@ function CreateEvents() {
                 }
         }
         getUsers();
-    },[]);
+         
+        const getEvent = async () => {
+            try {
+                const res = await AxiosGet(`events/${eventId}`, {
+                    user_id: user.id
+                });
+                if (res.length > 0) {
+                    populateFields(res[0]);
+                }else{
+                    throw new Error("Something went wrong!");
+                }
+                }catch (error) {
+                    console.error(error);
+                }
+        }
+        getEvent();
+    },[eventId, user.id]);
 
     const navigate = useNavigate();
 
-    const updateStates = (key: string, value: any) => {
-        setStates({
-            ...states,
-            [key]: value
-        });
-    }
 
-    const postEvent = async (event: any) => {
-        const res = await AxiosPost("events", event); 
+    const updateEvent = async (event: any) => {
+        const res = await AxiosPut(`events/${eventId}`, event); 
         if(res.isSuccess) {
             navigate('/events')
         }
@@ -73,7 +102,7 @@ function CreateEvents() {
         }
         const attendees = Array.from(states.attendees).map((attendee: any) => {
             return attendee.value;
-        }); 
+        });
         const newEvent = { 
             name: states.name,
             datetime: states.date,
@@ -81,7 +110,7 @@ function CreateEvents() {
             description: states.desc,
             user_id: user.id
         } 
-        await postEvent(newEvent);
+        await updateEvent(newEvent);
     }
     const formData = [
         {
@@ -90,7 +119,8 @@ function CreateEvents() {
             type: "text",
             placeholder: "Enter event name",
             title: "Event Name",
-            setInputState: (value: any) => updateStates('name', value)
+            setInputState: (value: any) => updateStates('name', value),
+            defaultValue: states.name
         },
         {
             id: 1,
@@ -98,7 +128,8 @@ function CreateEvents() {
             type: "text",
             placeholder: "Enter event description",
             title: "Event Description",
-            setInputState: (value: any) => updateStates('desc', value)
+            setInputState: (value: any) => updateStates('desc', value),
+            defaultValue: states.desc
         },
         {
             id: 2,
@@ -111,45 +142,28 @@ function CreateEvents() {
                     name: user.firstname + " " + user.lastname
                 }
             }),
-            setInputState: (value: any) => updateStates('attendees', value)
+            setInputState: (value: any) => updateStates('attendees', value),
+            defaultValue: states.attendees
         },
         {
             id: 3,
             name: "date",
             type: "date",
             title: "Event Date",
-            setInputState: (value: any) => updateStates('date', value)
+            setInputState: (value: any) => updateStates('date', value),
+            defaultValue: states.date
         }
     ]
   return (
-    // <div>
-    //     <div className="form">
-    //         <div className="input" >Name: <input type='text' defaultValue={states.name} onChange={(e:any)=>{updateStates(`name`, e.target.value)}}/></div>
-    //         <div className="input" >Description: <input type='text' defaultValue={states.desc} onChange={(e:any)=>{updateStates(`desc`, e.target.value)}}/></div>
-    //         <div className="input">Attendees:
-    //         <select multiple onChange={(e:any)=>{ updateStates(`attendees`, e.target.selectedOptions)}}>
-    //             {
-    //                 states.users.map((user: any) => {
-    //                     return <option key={user.id}>{user.firstName + " " + user.lastName}</option>
-    //                 })
-    //             }
-    //         </select>
-    //         </div>
-    //         <div className="input">Date: 
-    //         <input type='date' defaultValue={states.date} onChange={(e:any)=>{updateStates(`date`, e.target.value)}}/>
-    //         </div>
-    //         <button onClick={validateFields}>Create</button> 
-    //     </div>
-    // </div>
     <RootLayout>
         <FormContainer>
-        <h1 className="font-bold">New Event</h1>  
+        <h1 className="font-bold">Edit Event</h1>  
           {states.alertWarning?.length !== 0 &&
           <div className="bg-red-400 mt-1 text-sm text-white rounded-sm px-1 py-2">{states.alertWarning}</div>}
-            <Form btnTitle='Create' formData={formData}  buttonHandler={validateFields}/> 
+            <Form btnTitle='Edit' formData={formData}  buttonHandler={validateFields}/> 
         </FormContainer>
     </RootLayout>
   )
 }
 
-export default CreateEvents
+export default EditEvents
