@@ -5,6 +5,7 @@ import RootLayout from "./MainLayout";
 import { AxiosPost, AxiosPut } from "../Components/crud";
 import Form from "../Components/Layouts/Form";
 import FormContainer from "../Components/Layouts/FormContainer";
+import ModalTemplates from "../Components/Layouts/ModalTemplates";
 
 interface signUpProps {
   confirmPassword: string;
@@ -14,7 +15,7 @@ interface signUpProps {
 }
 
 function UpdatePassword() {
-    const userId = useParams().id;
+  const userId = useParams().id;
   const navigate = useNavigate();
   const [states, setStates] = useState<signUpProps>({
     confirmPassword: "",
@@ -29,7 +30,7 @@ function UpdatePassword() {
       name: "password",
       type: "password",
       placeholder: "Enter your password",
-      title: "password", 
+      title: "password",
       setInputState: (value: any) => setStates({ ...states, password: value }),
       defaultValue: states.password,
     },
@@ -38,11 +39,12 @@ function UpdatePassword() {
       name: "confirmPassword",
       type: "password",
       placeholder: "Confirm your password",
-      title: "Confirm Password", 
-      setInputState: (value: any) => setStates({ ...states, confirmPassword: value }),
+      title: "Confirm Password",
+      setInputState: (value: any) =>
+        setStates({ ...states, confirmPassword: value }),
       defaultValue: states.confirmPassword,
-    }
-  ]
+    },
+  ];
 
   const updateStates = (key: string, value: any) => {
     setStates({
@@ -59,22 +61,21 @@ function UpdatePassword() {
   }, [navigate]);
 
   const submit = async () => {
-    try { 
-    const res = await AxiosPut(`reset-password/${userId}`, { 
-      password: states.password,
-    }); 
-    if(res.isSuccess) {
-      updateStates(`alertWarning`, "");
-      updateStates(`alertSuccess`, "Password updated successfully");
-    }else{
-      throw new Error(res.message);
-    }
-    }catch (error : any) {
-      updateStates(`alertWarning`, "Invalid email or password")
+    try {
+      const res = await AxiosPut(`reset-password/${userId}`, {
+        password: states.password,
+      });
+      if (res.isSuccess) {
+        updateStates(`alertWarning`, "");
+        updateStates(`alertSuccess`, "Password updated successfully");
+      } else {
+        throw new Error(res.message);
+      }
+    } catch (error: any) {
+      updateStates(`alertWarning`, "Invalid email or password");
       console.error(error);
     }
   };
- 
 
   const validateFields = () => {
     states.password.length < 8
@@ -84,16 +85,54 @@ function UpdatePassword() {
       : submit();
   };
 
+  const modalData = {
+    title: "Update Password?",
+    message: "Are you sure you want to update your password?",
+    ok: "Yes, Update",
+    cancel: "No, Cancel",
+  };
+  const [showModel, setShowModel] = useState<boolean>(false);
+
+  const handleUpdate = () => {
+    setShowModel(true);
+  };
+  const updateFunc = () => {
+    handleUpdate();
+  };
+
   return (
     <RootLayout>
-     <FormContainer>
-          <h1 className="font-bold">Update Password</h1>  
-          {states.alertWarning?.length !== 0 &&
-          <div className="bg-red-400 mt-1 text-sm text-white rounded-sm px-1 py-2">{states.alertWarning}</div>}
-          {states.alertSuccess?.length !== 0 &&
-          <div className="bg-green-500 mt-1 text-sm text-white rounded-sm px-1 py-2">{states.alertSuccess}</div>}
-          <Form btnTitle="Update" buttonHandler={validateFields} formData={formData}/>   
-        </FormContainer>
+      <FormContainer>
+        <ModalTemplates
+          title={modalData.title}
+          message={modalData.message}
+          okText={modalData.ok}
+          cancelText={modalData.cancel}
+          toggle={showModel}
+          onCancel={() => setShowModel(false)}
+          onOk={() => {
+            modalData.title === "Update Password?"
+              ? validateFields()
+              : setShowModel(false);
+          }}
+        />
+        <h1 className="font-bold">Update Password</h1>
+        {states.alertWarning?.length !== 0 && (
+          <div className="bg-red-400 mt-1 text-sm text-white rounded-sm px-1 py-2">
+            {states.alertWarning}
+          </div>
+        )}
+        {states.alertSuccess?.length !== 0 && (
+          <div className="bg-green-500 mt-1 text-sm text-white rounded-sm px-1 py-2">
+            {states.alertSuccess}
+          </div>
+        )}
+        <Form
+          btnTitle="Update"
+          buttonHandler={updateFunc}
+          formData={formData}
+        />
+      </FormContainer>
     </RootLayout>
   );
 }

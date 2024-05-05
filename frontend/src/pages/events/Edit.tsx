@@ -167,11 +167,11 @@ function EditEvents() {
 
     const [showModel, setShowModel] = useState<boolean>(false); 
 
-    const handleSave = () => {
+    const handleEdit = () => {
     setShowModel(true);
 }
     const editFunc = () => {
-        handleSave();
+        handleEdit();
     }
 
   return (
