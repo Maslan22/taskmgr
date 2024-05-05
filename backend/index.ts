@@ -39,13 +39,13 @@ app.get("/", (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-    try {
+    try { 
         const email = req.body.email;
         const password = req.body.password;
         const user = sql`SELECT * FROM users WHERE email = ${email}`;
         const results = await user;
         if (results.length === 0) {
-        res.status(404).json({ error: "User not found" });
+        res.status(404).json({ isSuccess: false, message: "User not found" });
         } else {
         const match = bcrypt.compareSync(password, results[0].password);
         if (match) {
@@ -55,7 +55,7 @@ app.post("/login", async (req, res) => {
                 isSuccess: true
             });
         } else {
-            res.status(401).json({ error: "Invalid credentials" });
+            res.status(401).json({isSuccess:false, message: "Invalid credentials" });
         }
         }
     } catch (error: any) {
@@ -70,27 +70,72 @@ app.post("/register", async (req, res) => {
         var hash = bcrypt.hashSync(newUser.password, salt);
         newUser.password = hash;
         newUser.isadmin = newUser.isadmin ? '1' : '0';
-        const users = sql`INSERT INTO users ${sql(newUser, 'firstname', 'lastname', 'email','password', 'isadmin')}`; 
+        const users = sql`INSERT INTO users ${sql(newUser, 'firstname', 'lastname', 'email','password', 'isadmin')};`; 
         const results = await users; 
+        const user_id = sql`SELECT id FROM users WHERE email = ${newUser.email}`;
+        const user_id_res = await user_id;
         res.json({
             message: "User registered successfully",
-            data: results,
+            data: user_id_res[0],
             isSuccess: true
         });
     } catch (error: any) {
         res.status(500).json({ isSuccess: false, message: error.message });
     }
 });
-app.get("/events", async (req, res) => {
+
+app.put("/reset-password/:id", async (req, res) => { 
   try {
-    const getSql = sql`SELECT * FROM users WHERE id = ${req.body.user_id}`;
-    const getRes = await getSql;
+      const user_id = req.params.id;
+      const user_password = req.body.password;
+      var salt = bcrypt.genSaltSync(10);
+      var hash = bcrypt.hashSync(user_password, salt);  
+      const users = sql`update users set password = ${hash} where id = ${user_id}`;
+      const results = await users;   
+      res.json({
+          message: "Password updated successfully.",
+          data: results,
+          isSuccess: true
+      });
+  } catch (error: any) {
+      res.status(500).json({ isSuccess: false, message: error.message });
+  }
+});
+
+
+app.get("/verify", async (req: any, res) => {
+  try { 
+    const email = req.query.email; 
+    const users = sql`SELECT id FROM users where email = ${email}`;
+    const results = await users;
+    res.json({ 
+        data: results,
+        isSuccess: results.length > 0
+    });
+  } catch (error: any) {
+    res.status(500).json({ isSuccess: false, message: error.message });
+  }
+});
+
+app.get("/all-events", async (req: any, res) => {
+  try {
+      const events = sql`SELECT * FROM events`;
+      const results = await events;
+      res.json(results);
+  } catch (error:any) {
+      res.status(500).json({ isSuccess: false, message: error.message });
+  }
+}); 
+app.get("/events", async (req: any, res) => {
+  try {
+    const getSql = sql`SELECT isadmin FROM users WHERE id = ${req.query.user_id}`;
+    const getRes = await getSql; 
     if (getRes.length === 0) {
       res.status(404).json({ error: "User not found" });
     } else {
       const events =
-        getRes[0].isAdmin === true
-          ? sql`SELECT * FROM events WHERE user_id = ${req.body.user_id}`
+        getRes[0].isadmin !== "1"
+          ? sql`SELECT * FROM events WHERE createdby = ${req.query.user_id}`
           : sql`SELECT * FROM events`;
       const results = await events;
       res.json(results);
@@ -100,10 +145,22 @@ app.get("/events", async (req, res) => {
   }
 }); 
 
+app.get("/events/:id", async (req: any, res) => {
+  try { 
+      const isAdmin = req.query.isadmin; 
+      const event = isAdmin === "0" ?
+       sql`SELECT * FROM events WHERE  createdby= ${req.query.user_id} and id = ${req.params.id}`:
+       sql`SELECT * FROM events WHERE id = ${req.params.id}`;
+      const results = await event;
+      res.json(results);
+  } catch (error:any) {
+    res.status(500).json({ isSuccess: false, message: error.message });
+  }
+}); 
+
 app.post("/events", async (req, res) => {
     try {
       const newEvent = req.body; 
-
       newEvent.createdby = req.body.user_id; 
       const events = sql`INSERT INTO events ${sql(newEvent, 'name', 'attendants', 'description', 'createdby', 'datetime')}`; 
       const results = await events; 
@@ -147,15 +204,24 @@ app.post("/events", async (req, res) => {
     }
   });
 
-app.get("/users", async (req, res) => {
+app.get("/users", async (req, res) => { 
   try {
-    const users = sql`SELECT * FROM users`;
+    const users = sql`SELECT id,firstname,lastname,email,isadmin  FROM users`;
     const results = await users;
     res.json(results);
   } catch (error: any) {
     res.status(500).json({ isSuccess: false, message: error.message });
   }
 });
+app.get("/users/:id", async (req: any, res) => {
+  try { 
+      const user = sql`SELECT id,firstname,lastname,email,isadmin FROM users WHERE id = ${req.params.id}`;
+      const results = await user;
+      res.json(results);
+  } catch (error:any) {
+    res.status(500).json({ isSuccess: false, message: error.message });
+  }
+}); 
 app.post("/users", async (req, res) => {
   try {
     const newUser = req.body;
