@@ -48,8 +48,7 @@ function EditEvents() {
     React.useEffect(() => {
         const getUsers = async () => {
             try {
-                const res = await AxiosGet("users");
-                console.log(res);
+                const res = await AxiosGet("users"); 
                 if (res.length > 0) {
                     updateStates("users", res);
                 }else{
@@ -64,6 +63,7 @@ function EditEvents() {
         const getEvent = async () => {
             try {
                 const res = await AxiosGet(`events/${eventId}`, {
+                    isadmin: user.isadmin,
                     user_id: user.id
                 });
                 if (res.length > 0) {

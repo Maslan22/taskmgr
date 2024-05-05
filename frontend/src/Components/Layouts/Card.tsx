@@ -5,7 +5,7 @@ interface CardProps {
     title: string,
     description: string,
     btnTitle: string,
-    btnClick: () => void,
+    btnClick: (event: any) => Promise<void>,
     date: string,
     isAttendee: boolean
 }
@@ -20,7 +20,7 @@ export default function Card({title, description, btnTitle, btnClick,date, isAtt
     <p className="mb-4 text-base text-sm text-slate-400">
         {dayjs(date).format('DD MMM YYYY')} 
     </p>
-{isAttendee &&
+{!isAttendee &&
     <div className='text-center'>
   <button
     type="button" onClick={btnClick}

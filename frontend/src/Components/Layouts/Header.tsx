@@ -5,18 +5,17 @@ import logo from "../../assets/logo.svg";
 interface HeaderStates {
   firstName: string;
   lastName: string; 
-  isAdmin: boolean;
+  isAdmin: string;
 }
 export default function Header() {
   const navigate = useNavigate();
   const userSession = sessionStorage.getItem('user');
-  const user = userSession ? JSON.parse(userSession): '';
-
+  const user = userSession ? JSON.parse(userSession): ''; 
   const [states, setStates] = useState<HeaderStates>({
     firstName: user.firstname || '',
     lastName: user.lastname || '',
-    isAdmin: user.isadmin || false
-  });
+    isAdmin: user.isadmin || "0"
+  }); 
   const showDropDown = () => {
     const dropdown = document.getElementById("dropdownNavbar");
     const overlay = document.getElementById("overlay");
@@ -67,7 +66,7 @@ export default function Header() {
 {(states.firstName.length !== 0) &&
       <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white">
         <li>
-        <button onClick={showDropDown} id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar" className="flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto">{states.firstName + " " + states.lastName}<svg className="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+        <button onClick={showDropDown} id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar" className="flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto">Welcome {states.firstName + " " + states.lastName}<svg className="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
     <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
   </svg></button> 
             <div id="dropdownNavbar" className="z-10 hidden font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 absolute z-20">
@@ -78,7 +77,7 @@ export default function Header() {
                   <li>
                     <Link to="/events" className="block px-4 py-2 hover:bg-gray-100">Manage Events</Link>
                   </li>
-                  {states.isAdmin &&
+                  {states.isAdmin !== "0" &&
                   <li>
                     <Link to="/users" className="block px-4 py-2 hover:bg-gray-100">Manage Users</Link>
                   </li>}

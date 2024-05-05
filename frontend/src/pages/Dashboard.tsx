@@ -52,7 +52,7 @@ const Dashboard = () => {
       useEffect(() => {
         const getEvents = async () => {
             try { 
-                const eventsRes = await AxiosGet("events", {
+                const eventsRes = await AxiosGet("all-events", {
                   user_id: user.id
                 }); 
                 if (eventsRes.length > 0) {
@@ -74,9 +74,13 @@ const Dashboard = () => {
         }
     },[navigate]);
     const addToAttendees = async (event : any) => {
-        event["attendants"] = event["attendants"] + "," + states.firstName + " " + states.lastName;
+        const updatedEvent = {
+          ...event,
+          attendants: event.attendants + "," + user.firstname + " " + user.lastname,
+          user_id: user.id
+        }; 
         try {
-            const res = await AxiosPut("events", states.events);
+            const res = await AxiosPut(`events/${updatedEvent.id}`, updatedEvent);
             if (res.isSuccess) {
               //added successfully
             }else{
@@ -87,15 +91,15 @@ const Dashboard = () => {
             }
     }
     const isAttendee = (attendees: any) => {
-        const attendeesArr = attendees.split(",");
-        return attendeesArr.includes(states.firstName + " " + states.lastName);
+      const attendeesArr = attendees.split(","); 
+        return attendeesArr.includes(user.firstname + " " + user.lastname);
     }
   return (
     <RootLayout>
     <div className="mt-10 flex flex-wrap justify-center space-x-5 space-y-5">{
         states.events.map((card: any) => {
             return( 
-            <Card isAttendee={isAttendee(card.attendants)} btnTitle="Join" key={card.id} title={card.name} date={card.date} description={card.description} btnClick={async () => addToAttendees}/>
+            <Card isAttendee={isAttendee(card.attendants)} btnTitle="Join" key={card.id} title={card.name} date={card.date} description={card.description} btnClick={() => addToAttendees(card)}/>
             )
         })} 
     </div>
