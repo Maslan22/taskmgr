@@ -96,7 +96,7 @@ const Dashboard = () => {
     }
   return (
     <RootLayout>
-    <div className="mt-10 flex flex-wrap justify-center space-x-5 space-y-5">{
+    <div className="mt-10 flex flex-wrap justify-center space-x-5 gap-y-5">{
         states.events.map((card: any) => {
             return( 
             <Card isAttendee={isAttendee(card.attendants)} btnTitle="Join" key={card.id} title={card.name} date={card.date} description={card.description} btnClick={() => addToAttendees(card)}/>
