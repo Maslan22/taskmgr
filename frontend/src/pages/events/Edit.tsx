@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Users, addEvent } from '../../data';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AxiosGet, AxiosPost, AxiosPut } from '../../Components/crud';
@@ -6,6 +6,7 @@ import RootLayout from '../MainLayout';
 import FormContainer from '../../Components/Layouts/FormContainer';
 import Form from '../../Components/Layouts/Form';
 import dayjs from 'dayjs';
+import ModalTemplates from '../../Components/Layouts/ModalTemplates';
 
 interface CreateEventStates {
     name: string,
@@ -154,13 +155,43 @@ function EditEvents() {
             defaultValue: states.date
         }
     ]
+
+    const modalData = {
+        title: 'Updating Event',
+        message: 'Are you sure you want to update this event?',
+        ok: 'Yes, Update',
+        cancel: 'No, Cancel'
+        // Ok: () => validateFields(),
+        // cancel: () => setShowModel(false)
+    }
+
+    const [showModel, setShowModel] = useState<boolean>(false); 
+
+    const handleSave = () => {
+    setShowModel(true);
+}
+    const editFunc = () => {
+        handleSave();
+    }
+
   return (
     <RootLayout>
         <FormContainer>
+        <ModalTemplates 
+                title={modalData.title} 
+                message={modalData.message} 
+                okText={modalData.ok} 
+                cancelText={modalData.cancel} 
+                toggle={showModel} 
+                onCancel={()=> setShowModel(false)} 
+                onOk={() => {
+                    modalData.title === 'Updating Event' ? validateFields() : setShowModel(false)
+                }}
+            />
         <h1 className="font-bold">Edit Event</h1>  
           {states.alertWarning?.length !== 0 &&
           <div className="bg-red-400 mt-1 text-sm text-white rounded-sm px-1 py-2">{states.alertWarning}</div>}
-            <Form btnTitle='Edit' formData={formData}  buttonHandler={validateFields}/> 
+            <Form btnTitle='Edit' formData={formData}  buttonHandler={editFunc}/> 
         </FormContainer>
     </RootLayout>
   )

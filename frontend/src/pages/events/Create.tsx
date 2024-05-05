@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Users, addEvent } from '../../data';
 import { useNavigate } from 'react-router-dom';
 import { AxiosGet, AxiosPost } from '../../Components/crud';
 import RootLayout from '../MainLayout';
 import FormContainer from '../../Components/Layouts/FormContainer';
 import Form from '../../Components/Layouts/Form';
+import ModalTemplates from '../../Components/Layouts/ModalTemplates';
 
 interface CreateEventStates {
     name: string,
@@ -121,6 +122,22 @@ function CreateEvents() {
             setInputState: (value: any) => updateStates('date', value)
         }
     ]
+    
+    const modalData = {
+        title: 'Create Event',
+        message: 'Are you sure you want to create this event?',
+        ok: 'Yes, Create',
+        cancel: 'No, Cancel'
+    }
+    const [showModel, setShowModel] = useState<boolean>(false); 
+
+    const handleSave = () => {
+    setShowModel(true);
+}
+    const createFunc = () => {
+        handleSave();
+    }
+
   return (
     // <div>
     //     <div className="form">
@@ -143,10 +160,21 @@ function CreateEvents() {
     // </div>
     <RootLayout>
         <FormContainer>
+        <ModalTemplates 
+                title={modalData.title} 
+                message={modalData.message} 
+                okText={modalData.ok} 
+                cancelText={modalData.cancel} 
+                toggle={showModel} 
+                onCancel={()=> setShowModel(false)} 
+                onOk={() => {
+                    modalData.title === 'Create Event' ? validateFields() : setShowModel(false)
+                }}
+            />
         <h1 className="font-bold">New Event</h1>  
           {states.alertWarning?.length !== 0 &&
           <div className="bg-red-400 mt-1 text-sm text-white rounded-sm px-1 py-2">{states.alertWarning}</div>}
-            <Form btnTitle='Create' formData={formData}  buttonHandler={validateFields}/> 
+            <Form btnTitle='Create' formData={formData}  buttonHandler={createFunc}/> 
         </FormContainer>
     </RootLayout>
   )

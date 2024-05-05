@@ -1,54 +1,39 @@
-import React from 'react'
+import React from 'react';
 
-interface ModalTemplatesProps {
+interface ModalProps {
     title: string;
     message: string;
-    Ok: string;
-    cancel: string;
+    onOk?: () => void;
+    onCancel?: () => void;
+    okText?: string;
+    cancelText?: string;
+    toggle: boolean;
 }
 
-export default function ModalTemplates({title, message, Ok, cancel}: ModalTemplatesProps) {
-  return (
-    <div>
-
-
-{/* <!-- Modal toggle --> */}
-<button data-modal-target="default-modal" data-modal-toggle="default-modal" className="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
-  Toggle modal
-</button>
-
-{/* <!-- Main modal --> */}
-<div id="default-modal" tabIndex={-1} aria-hidden="true" className="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-    <div className="relative p-4 w-full max-w-2xl max-h-full">
-        {/* <!-- Modal content --> */}
-        <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-            {/* <!-- Modal header --> */}
-            <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    {title}
-                </h3>
-                <button type="button" className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="default-modal">
-                    <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                    </svg>
-                    <span className="sr-only">Close modal</span>
-                </button>
-            </div>
-            {/* <!-- Modal body --> */}
-            <div className="p-4 md:p-5 space-y-4">
-                <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                    {message}
-                </p>
-            </div>
-            {/* <!-- Modal footer --> */}
-            <div className="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
-                <button data-modal-hide="default-modal" type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{Ok}</button>
-                <button data-modal-hide="default-modal" type="button" className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">{cancel}</button>
+const ModalTemplate: React.FC<ModalProps> = ({ title, message, onOk, onCancel, okText, cancelText, toggle }) => {
+    return (
+        <div className={`fixed inset-0 flex items-center justify-center z-50 ${toggle ? '' : 'hidden'}`}>
+            <div className="bg-white rounded-lg p-6">
+                <div className="flex justify-end">
+                    <button aria-label="Close" className="px-2 py-1 text-gray-500" onClick={onCancel ? onCancel : undefined}>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 1a9 9 0 100 18A9 9 0 0010 1zm4.95 12.95a.75.75 0 01-1.06 1.06L10 11.06l-3.89 3.89a.75.75 0 11-1.06-1.06L8.94 10 5.05 6.11a.75.75 0 111.06-1.06L10 8.94l3.89-3.89a.75.75 0 111.06 1.06L11.06 10l3.89 3.89z" clipRule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+                <h2 className="text-xl font-bold mb-4">{title}</h2>
+                <p className="mb-4">{message}</p>
+                <div className="flex justify-end">
+                    <button className="mr-2 px-4 py-2 bg-blue-500 text-white rounded" onClick={onOk ? onOk : undefined}>
+                        {okText}
+                    </button>
+                    <button className="px-4 py-2 bg-gray-500 text-white rounded" onClick={onCancel ? onCancel : undefined}>
+                        {cancelText}
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-</div>
+    );
+};
 
-    </div>
-  )
-}
+export default ModalTemplate;
