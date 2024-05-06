@@ -48,7 +48,7 @@ const Dashboard = () => {
         });
       };
 
-      
+      const [referesh, setRefresh] = useState<number>(0);
       useEffect(() => {
         const getEvents = async () => {
             try { 
@@ -65,7 +65,7 @@ const Dashboard = () => {
                 }
         }
         getEvents();
-    },[]);
+    },[referesh]);
     const navigate = useNavigate();
     useEffect(() => {
         const user = sessionStorage.getItem('user');
@@ -82,7 +82,7 @@ const Dashboard = () => {
         try {
             const res = await AxiosPut(`events/${updatedEvent.id}`, updatedEvent);
             if (res.isSuccess) {
-              //added successfully
+              setRefresh(referesh + 1);
             }else{
               throw new Error("Something went wrong!");
             }
