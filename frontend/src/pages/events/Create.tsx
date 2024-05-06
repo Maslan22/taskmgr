@@ -27,6 +27,8 @@ function CreateEvents() {
         alertWarning: ''
     });
 
+    const [referesh, setReferesh] = useState<boolean>(false);
+
     React.useEffect(() => {
         const getUsers = async () => {
             try {
@@ -42,7 +44,7 @@ function CreateEvents() {
                 }
         }
         getUsers();
-    },[]);
+    },[referesh]);
 
     const navigate = useNavigate();
 
@@ -57,6 +59,7 @@ function CreateEvents() {
         const res = await AxiosPost("events", event); 
         if(res.isSuccess) {
             navigate('/events')
+            setReferesh(!referesh);
         }
     }
     const validateFields = async () => {

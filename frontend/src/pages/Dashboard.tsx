@@ -48,7 +48,7 @@ const Dashboard = () => {
         });
       };
 
-      const [referesh, setRefresh] = useState<number>(0);
+      const [referesh, setRefresh] = useState<boolean>(false);
       useEffect(() => {
         const getEvents = async () => {
             try { 
@@ -82,7 +82,7 @@ const Dashboard = () => {
         try {
             const res = await AxiosPut(`events/${updatedEvent.id}`, updatedEvent);
             if (res.isSuccess) {
-              setRefresh(referesh + 1);
+              setRefresh(!referesh);
             }else{
               throw new Error("Something went wrong!");
             }

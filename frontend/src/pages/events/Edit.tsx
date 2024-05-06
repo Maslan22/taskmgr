@@ -46,6 +46,8 @@ function EditEvents() {
             desc: event.description
         })); 
     }
+    const [referesh, setReferesh] = useState<boolean>(false);
+
     React.useEffect(() => {
         const getUsers = async () => {
             try {
@@ -77,7 +79,7 @@ function EditEvents() {
                 }
         }
         getEvent();
-    },[eventId, user.id]);
+    },[eventId, user.id,referesh]);
 
     const navigate = useNavigate();
 
@@ -86,6 +88,7 @@ function EditEvents() {
         const res = await AxiosPut(`events/${eventId}`, event); 
         if(res.isSuccess) {
             navigate('/events')
+            setReferesh(!referesh);
         }
     }
     const validateFields = async () => {

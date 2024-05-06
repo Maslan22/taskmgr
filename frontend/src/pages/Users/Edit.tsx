@@ -43,6 +43,9 @@ function EditUsers() {
             email: user.email, 
         }));  
     }
+
+    const [referesh, setReferesh] = React.useState<boolean>(false);
+
     React.useEffect(() => { 
         const getUser = async () => {
             try {
@@ -59,7 +62,7 @@ function EditUsers() {
                 }
         }
         getUser();
-    },[userId, user.id]);
+    },[userId, user.id,referesh]);
 
     const navigate = useNavigate();
 
@@ -68,6 +71,7 @@ function EditUsers() {
         const res = await AxiosPut(`users/${userId}`, user); 
         if(res.isSuccess) {
             navigate('/users')
+            setReferesh(!referesh);
         }
     }
     const validateFields = async () => {

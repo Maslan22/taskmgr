@@ -34,12 +34,14 @@ function Users() {
             name: "Actions"
         }
     ]
+    const [referesh, setReferesh] = React.useState<boolean>(false);
     const deleteUser = async (user: any) => { 
           try {
-            const deleteRes = await AxiosDelete(`users/${user}`);
+            const deleteRes = await AxiosDelete(`users/${user}`,referesh);
             if (deleteRes) {
               const users = states.users.filter((u: any) => u.id !== user);
               updateStates("users", users);
+              setReferesh(!referesh);
             } else {
               throw new Error("Something went wrong!");
             }
