@@ -33,7 +33,12 @@ export default function Header() {
       overlay.classList.add("hidden");
     }
   };
-  const openMenu = () => {};
+  const openMenu = () => {
+    const navbar = document.getElementById("navbar-default");
+    if (navbar) {
+      navbar.classList.toggle("hidden");
+    }
+  };
   const logout = () => {
     sessionStorage.clear();
     navigate("/");
