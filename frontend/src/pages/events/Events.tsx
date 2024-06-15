@@ -101,7 +101,7 @@ function Events() {
 
   const modalData = {
     title: "Delete Event",
-    message: "Are you sure you want to delete this event?",
+    message: "Are you certain you want to remove this event?",
     okText: "Yes, Delete",
     cancelText: "No, Cancel",
   }
