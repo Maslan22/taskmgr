@@ -117,7 +117,7 @@ function Events() {
             onCancel={()=> setShowModel(false)} 
             onOk={deleteEvent}
         />
-        <div className='w-4/5 text-center'>
+        <div className='text-center w-4/5 '>
             <Table createClick={createClick} editUrl="/events" deleteHandler={handleDelete} headers={headers} data={states.events.filter((event : any) => {
                 delete event.createdby;
                 event.datetime = dayjs(event.datetime).format("DD MMM YYYY");
