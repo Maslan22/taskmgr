@@ -193,7 +193,7 @@ function EditEvents() {
             />
         <h1 className="font-bold">Edit Event</h1>  
           {states.alertWarning?.length !== 0 &&
-          <div className="bg-red-400 mt-1 text-sm text-white rounded-sm px-1 py-2">{states.alertWarning}</div>}
+          <div className="mt-1 bg-red-400 text-sm text-white rounded-sm px-1 py-2">{states.alertWarning}</div>}
             <Form btnTitle='Edit' formData={formData}  buttonHandler={editFunc}/> 
         </FormContainer>
     </RootLayout>
